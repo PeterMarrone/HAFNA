@@ -46,7 +46,7 @@ void loop() {
 
   if(displaySelect == 1) {  // Servo Control "Reflection Loss"
     lcd.setCursor(1, 0);
-    lcd.print("Reflection Loss");
+    lcd.print("Servo Control");
     if(digitalRead(leftButton) == LOW) {
       if(position >= 0) {
         position--;
@@ -54,7 +54,7 @@ void loop() {
         testServo.write(position);
         if(position >= 0) {
           lcd.setCursor(1, 0);
-          lcd.print("Reflection Loss");
+          lcd.print("Servo Control");
           lcd.setCursor(0, 1);
           lcd.print("Servo Angle:");
           lcd.println(position);
@@ -69,7 +69,7 @@ void loop() {
         testServo.write(position);
         if(position <= 180) {
           lcd.setCursor(1, 0);
-          lcd.print("Reflection Loss");
+          lcd.print("Servo Control");
           lcd.setCursor(0, 1);
           lcd.print("Servo Angle:");
           lcd.println(position);
@@ -85,13 +85,13 @@ void loop() {
 
   if(displaySelect == 2) {  // Stepper Control "Insertion Loss"
     lcd.setCursor(1, 0);
-    lcd.print("Insertion Loss");
+    lcd.print("Stepper Control");
     if(digitalRead(leftButton) == LOW) {
       if(ledSelect == 0) {
         digitalWrite(44, HIGH);
         lcd.clear();
         lcd.setCursor(1, 0);
-        lcd.print("Insertion Loss");
+        lcd.print("Stepper Control");
         lcd.setCursor(0, 1);
         lcd.print("Stepper: Blue");
         delay(250);
@@ -103,7 +103,7 @@ void loop() {
         digitalWrite(46, HIGH);
         lcd.clear();
         lcd.setCursor(1, 0);
-        lcd.print("Insertion Loss");
+        lcd.print("Stepper Control");
         lcd.setCursor(0, 1);
         lcd.print("Stepper: Red");
         delay(250);
@@ -115,7 +115,7 @@ void loop() {
         digitalWrite(48, HIGH);
         lcd.clear();
         lcd.setCursor(1, 0);
-        lcd.print("Insertion Loss");
+        lcd.print("Stepper Control");
         lcd.setCursor(0, 1);
         lcd.print("Stepper: Green");
         delay(250);
@@ -130,7 +130,7 @@ void loop() {
         digitalWrite(48, HIGH);
         lcd.clear();
         lcd.setCursor(1, 0);
-        lcd.print("Insertion Loss");
+        lcd.print("Stepper Control");
         lcd.setCursor(0, 1);
         lcd.print("Stepper: Green");
         delay(250);
@@ -142,7 +142,7 @@ void loop() {
         digitalWrite(46, HIGH);
         lcd.clear();
         lcd.setCursor(1, 0);
-        lcd.print("Insertion Loss");
+        lcd.print("Stepper Control");
         lcd.setCursor(0, 1);
         lcd.print("Stepper: Red");
         delay(250);
@@ -154,7 +154,7 @@ void loop() {
         digitalWrite(44, HIGH);
         lcd.clear();
         lcd.setCursor(1, 0);
-        lcd.print("Insertion Loss");
+        lcd.print("Stepper Control");
         lcd.setCursor(0, 1);
         lcd.print("Stepper: Blue");
         delay(250);
