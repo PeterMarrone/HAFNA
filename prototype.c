@@ -1,61 +1,176 @@
 #include <LiquidCrystal.h>
 #include <Servo.h>
-#include <Stepper.h>
 
 Servo testServo;
-int position = 0; // Initial position of Servo.
+int position = 90; // Initial position of Servo.
 
-const int stepsPerRev = ;   // Steps per revolution of specific motor
-Stepper testStepper(stepsPerRev, , , ,);    // 
-int stepCount = 0;
+const int rs = 2, en = 3, d4 = 4, d5 = 5, d6 = 6, d7 = 7; // Pins used for LCD1602 screen
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7); // Initialize the LCD
 
-const int rs = 2, en = 3, d4 = 4, d5 = 5, d6 = 6, d7 = 7; // Fill this in with pins used
-LiquidCrystal lcd(rs, en, d4, d5, d6, d7); // Input pins here
+int leftButton = 10;  // Left button in pin 10
+int centerButton = 9; // Center button in pin 9
+int rightButton = 8;  // Right button in pin 8
 
 int leftButton = 10; // Pin of button
 int rightButton = 9; // Pin of button
 int centerButton = 8; // Pin of button
 
+int displaySelect = 0;  // Variable to move between display menus
+int ledSelect = 0;  // Variable to control LEDs
+
 void setup() {
-  testServo.attach(12); // Insert pin number connected to on board.
-  testServo.write(position);
-  lcd.begin(16, 2);
-  pinMode(leftButton, INPUT_PULLUP);
-  pinMode(rightButton, INPUT_PULLUP);
-  pinMode(centerButton, INPUT_PULLUP);
+  testServo.attach(13); // Servo attached to pin 13
+  testServo.write(position);  // Set inital position of servo 
+  lcd.begin(16, 2); // Define LCD screen
+  pinMode(leftButton, INPUT_PULLUP);  // Set pullup resistors for left button
+  pinMode(rightButton, INPUT_PULLUP); // Set pullup resistors for right button
+  pinMode(centerButton, INPUT_PULLUP);  // Set pulluo resistors for center button
+  pinMode(44, OUTPUT);  // Output pins for blue LED
+  pinMode(46, OUTPUT);  // Output pins for red LED
+  pinMode(48, OUTPUT);  // Output pins for green LED
 }
 
 void loop() {
-  lcd.print("HAFNA");
-  lcd.print("Left button -> Stepper | Right button -> Servo");
 
-  // Code to determine which motor to contorl
-
-  if(digitalRead(leftButton) == LOW) {
-    position--;
-    delay(2);
-    testServo.write(position);
-    lcd.println(position);
+  if(displaySelect == 0) {    // Main Menu
+    lcd.print("Left: Servo");
+    lcd.setCursor(0, 1);
+    lcd.print("Right: Stepper  ");
+    if(digitalRead(leftButton) == LOW) {
+      lcd.clear();
+      displaySelect = 1;
+      delay(200); // Debounce button
+    }
+    if(digitalRead(rightButton) == LOW) {
+      lcd.clear();
+      displaySelect = 2;
+      delay(200); // Debounce button
+    }
   }
 
-  if(digitalRead(rightButton) == LOW) {
-    position++;
-    delay(2);
-    testServo.write(position);
-    lcd.println(position);
+  if(displaySelect == 1) {  // Servo Control 
+    lcd.setCursor(1, 0);
+    lcd.print("Servo Control");
+    if(digitalRead(leftButton) == LOW) {
+      if(position >= 0) {
+        position--;
+        delay(5);
+        testServo.write(position);
+        if(position >= 0) {
+          lcd.setCursor(1, 0);
+          lcd.print("Servo Control");
+          lcd.setCursor(0, 1);
+          lcd.print("Servo Angle:");
+          lcd.println(position);
+        }
+      }
+    }
+
+    if(digitalRead(rightButton) == LOW) {
+      if(position <= 180) {
+        position++;
+        delay(5);
+        testServo.write(position);
+        if(position <= 180) {
+          lcd.setCursor(1, 0);
+          lcd.print("Servo Control");
+          lcd.setCursor(0, 1);
+          lcd.print("Servo Angle:");
+          lcd.println(position);
+        }
+      }
+    }
+
+    if(digitalRead(centerButton) == LOW) {  // Return to Main Menu
+      lcd.clear();
+      displaySelect = 0;
+    }
   }
 
-  if(digitalRead(centerButton) == LOW) {  // Kill switch
-    position = 0;
-    testServo.write(position);
+  if(displaySelect == 2) {  // Stepper Control
+    lcd.setCursor(1, 0);
+    lcd.print("Stepper Control");
+    if(digitalRead(leftButton) == LOW) {
+      if(ledSelect == 0) {
+        digitalWrite(44, HIGH);
+        lcd.clear();
+        lcd.setCursor(1, 0);
+        lcd.print("Stepper Control");
+        lcd.setCursor(0, 1);
+        lcd.print("Stepper: Blue");
+        delay(250);
+        digitalWrite(44, LOW);
+        lcd.clear();
+        ledSelect = 1;
+      }
+      if(ledSelect == 1){
+        digitalWrite(46, HIGH);
+        lcd.clear();
+        lcd.setCursor(1, 0);
+        lcd.print("Stepper Control");
+        lcd.setCursor(0, 1);
+        lcd.print("Stepper: Red");
+        delay(250);
+        digitalWrite(46, LOW);
+        lcd.clear();
+        ledSelect = 2;
+      }
+      if(ledSelect == 2){
+        digitalWrite(48, HIGH);
+        lcd.clear();
+        lcd.setCursor(1, 0);
+        lcd.print("Stepper Control");
+        lcd.setCursor(0, 1);
+        lcd.print("Stepper: Green");
+        delay(250);
+        digitalWrite(48, LOW);
+        lcd.clear();
+        ledSelect = 0;
+      }
+    }
 
-  }
+    if(digitalRead(rightButton) == LOW) {
+      if(ledSelect == 0) {
+        digitalWrite(48, HIGH);
+        lcd.clear();
+        lcd.setCursor(1, 0);
+        lcd.print("Stepper Control");
+        lcd.setCursor(0, 1);
+        lcd.print("Stepper: Green");
+        delay(250);
+        digitalWrite(48, LOW);
+        lcd.clear();
+        ledSelect = 1;
+      }
+      if(ledSelect == 1){
+        digitalWrite(46, HIGH);
+        lcd.clear();
+        lcd.setCursor(1, 0);
+        lcd.print("Stepper Control");
+        lcd.setCursor(0, 1);
+        lcd.print("Stepper: Red");
+        delay(250);
+        digitalWrite(46, LOW);
+        lcd.clear();
+        ledSelect = 2;
+      }
+      if(ledSelect == 2){
+        digitalWrite(44, HIGH);
+        lcd.clear();
+        lcd.setCursor(1, 0);
+        lcd.print("Stepper Control");
+        lcd.setCursor(0, 1);
+        lcd.print("Stepper: Blue");
+        delay(250);
+        digitalWrite(44, LOW);
+        lcd.clear();
+        ledSelect = 0;
+      }
+    }
 
-
-  if(digitalRead(rightButton) == LOW) {   // Steps the stepper motor a very small amount
-    testStepper.step(1);
-    lcd.println(stepCount);
-    stepCount++;
-    delay(500);
+    if(digitalRead(centerButton) == LOW) {  // Return to Main Menu
+      lcd.clear();
+      displaySelect = 0;
+    }
   }
 }
