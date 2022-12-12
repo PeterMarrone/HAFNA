@@ -12,9 +12,9 @@ int stepCount = 0;
 const int rs = 2, en = 3, d4 = 4, d5 = 5, d6 = 6, d7 = 7; // Fill this in with pins used
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7); // Input pins here
 
-int leftButton = 9; // Pin of button
-int rightButton = 8; // Pin of button
-int centerButton = ; // Pin of button
+int leftButton = 10; // Pin of button
+int rightButton = 9; // Pin of button
+int centerButton = 8; // Pin of button
 
 void setup() {
   testServo.attach(12); // Insert pin number connected to on board.
