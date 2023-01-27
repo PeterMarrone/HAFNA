@@ -11,6 +11,10 @@ int leftButton = 10;  // Left button in pin 10
 int centerButton = 9; // Center button in pin 9
 int rightButton = 8;  // Right button in pin 8
 
+int leftButton = 10; // Pin of button
+int rightButton = 9; // Pin of button
+int centerButton = 8; // Pin of button
+
 int displaySelect = 0;  // Variable to move between display menus
 int ledSelect = 0;  // Variable to control LEDs
 
@@ -44,7 +48,7 @@ void loop() {
     }
   }
 
-  if(displaySelect == 1) {  // Servo Control "Reflection Loss"
+  if(displaySelect == 1) {  // Servo Control 
     lcd.setCursor(1, 0);
     lcd.print("Servo Control");
     if(digitalRead(leftButton) == LOW) {
@@ -77,13 +81,13 @@ void loop() {
       }
     }
 
-    if(digitalRead(centerButton) == LOW) {  // REturn to Main Menu
+    if(digitalRead(centerButton) == LOW) {  // Return to Main Menu
       lcd.clear();
       displaySelect = 0;
     }
   }
 
-  if(displaySelect == 2) {  // Stepper Control "Insertion Loss"
+  if(displaySelect == 2) {  // Stepper Control
     lcd.setCursor(1, 0);
     lcd.print("Stepper Control");
     if(digitalRead(leftButton) == LOW) {
