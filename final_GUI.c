@@ -7,6 +7,9 @@ extern uint8_t BigFont[];
 UTFT myGLCD(SSD1963_800480,38,39,40,41);  
 /* (byte model, int RS, int WR, int CS, int RST, int SER) */
 
+unsigned long previousMillis = 0UL;
+unsigned long interval = 10000UL;
+
 int displayCount = 0;
 int screenShown = 0;
 
@@ -43,21 +46,18 @@ void loop()
   if(displayCount == 0) {
     if(screenShown == 1) {
         if(greenButton == LOW) {
-          myGLCD.clrScr();
           screenShown = 0;
           displayCount = 1;
           antennaSelection = 2;
         }
 
         if(blackButton == LOW) {
-          myGLCD.clrScr();
           screenShown = 0;
           displayCount = 1;
           antennaSelection = 1;
         }
         
         if(redButton == LOW) {
-          myGLCD.clrScr();
           screenShown = 0;
           displayCount = 1;
           antennaSelection = 0;
@@ -85,20 +85,17 @@ void loop()
   if(displayCount == 1) {
     if(screenShown == 1) {
         if(greenButton == LOW) {
-          myGLCD.clrScr();
           screenShown = 0;
           displayCount = 2;
           testSelection = 1;
         }
 
         if(blackButton == LOW) {
-          myGLCD.clrScr();
           screenShown = 0;
           displayCount = 0;
         }
         
         if(redButton == LOW) {
-          myGLCD.clrScr();
           screenShown = 0;
           displayCount = 2;
           testSelection = 2;
@@ -125,12 +122,11 @@ void loop()
 
   if(testSelection == 1) {
     if(displayCount == 2) {
-      if(screenShown == 1) {
+      if(screenShown == 1) {    
         if(blackButton == LOW) {
           screenShown = 0;
-          myGLCD.clrScr();
-          displayCount = 1;
-        } 
+          displayCount = 1; 
+        }
       }
       else {
         myGLCD.fillScr(255, 255, 255);
@@ -162,7 +158,6 @@ void loop()
       if(screenShown == 1) {
         if(blackButton == LOW) {
           screenShown = 0;
-          myGLCD.clrScr();
           displayCount = 1;
         }
       }
@@ -198,7 +193,6 @@ void loop()
       if(screenShown == 1) {
         if(blackButton == LOW) {
           screenShown = 0;
-          myGLCD.clrScr();
           displayCount = 1;
         } 
       }
@@ -232,7 +226,6 @@ void loop()
       if(screenShown == 1) {
         if(blackButton == LOW) {
           screenShown = 0;
-          myGLCD.clrScr();
           displayCount = 1;
         }
       }
@@ -288,11 +281,11 @@ void displayTest(int select) {
 
   if(test == 1){
     myGLCD.setColor(255, 255, 255);
-    myGLCD.print("Antenna Selected: Reflection Loss", 0, 15);
+    myGLCD.print("Test Selected: Reflection Loss", 0, 15);
   }
 
   if(test == 2) {
     myGLCD.setColor(255, 255, 255);
-    myGLCD.print("Antenna Selected: Insertion Loss", 0, 15);
+    myGLCD.print("Test Selected: Insertion Loss", 0, 15);
   }
 }
