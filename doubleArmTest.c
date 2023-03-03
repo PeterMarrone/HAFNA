@@ -18,9 +18,8 @@ void setup() {
   pinMode(black, INPUT_PULLUP);
   pinMode(green, INPUT_PULLUP);
 
-  doubleArmMotor.setMaxSpeed(100);
+  doubleArmMotor.setMaxSpeed(150);
   doubleArmMotor.setAcceleration(50);
-  doubleArmMotor.setSpeed(100);
 
   currPosition = doubleArmMotor.currentPosition();
   resetPosition = doubleArmMotor.currentPosition();
@@ -32,9 +31,8 @@ void loop() {
   int greenButton = digitalRead(green);
 
   if(redButton == LOW) {
-    currPosition -= 1;
-    doubleArmMotor.moveTo(currPosition);
-    doubleArmMotor.run();
+    doubleArmMotor.setSpeed(-150);
+    doubleArmMotor.runSpeed();
   }
 
   if(blackButton == LOW) {
@@ -43,8 +41,7 @@ void loop() {
   }
 
   if(greenButton == LOW) {
-    currPosition += 1;
-    doubleArmMotor.moveTo(currPosition);
+    doubleArmMotor.setSpeed(150);
     doubleArmMotor.run();
   }
 }
