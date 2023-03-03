@@ -5,33 +5,47 @@
 const int red = 54;
 const int black = 55;
 const int green = 56;
-const int stepPin = 1;
-const int dirPin = 2;
+const int stepPin = 62;
+const int dirPin = 63;
+
+int currPosition = 0;
+int resetPosition = 0;
+
 
 AccelStepper doubleArmMotor(motorInterfaceType, stepPin, dirPin);
 
 void setup() {
-  // put your setup code here, to run once:
   pinMode(red, INPUT_PULLUP);
   pinMode(black, INPUT_PULLUP);
   pinMode(green, INPUT_PULLUP);
 
-  doubleArmMotor.setMaxSpeed(1000);
+  doubleArmMotor.setMaxSpeed(100);
   doubleArmMotor.setAcceleration(50);
-  doubleArmMotor.setSpeed(200);
+  doubleArmMotor.setSpeed(100);
+
+  currPosition = doubleArmMotor.currentPosition();
+  resetPosition = doubleArmMotor.currentPosition();
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
   int redButton = digitalRead(red);
   int blackButton = digitalRead(black);
   int greenButton = digitalRead(green);
 
   if(redButton == LOW) {
-    // Move motor backwards
+    currPosition -= 1;
+    doubleArmMotor.moveTo(currPosition);
+    doubleArmMotor.run();
+  }
+
+  if(blackButton == LOW) {
+    doubleArmMotor.moveTo(resetPosition);
+    doubleArmMotor.run();
   }
 
   if(greenButton == LOW) {
-    // Move motor forward
+    currPosition += 1;
+    doubleArmMotor.moveTo(currPosition);
+    doubleArmMotor.run();
   }
 }
