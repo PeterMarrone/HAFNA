@@ -11,7 +11,6 @@ const int dirPin = 63;
 int currPosition = 0;
 int resetPosition = 0;
 
-
 AccelStepper doubleArmMotor(motorInterfaceType, stepPin, dirPin);
 
 void setup() {
