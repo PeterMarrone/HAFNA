@@ -1,7 +1,11 @@
 #include <UTFT.h>
 #include <AccelStepper.h>
+#include <NewPing.h>
 
 #define motorInterfaceType 1
+#define MAX_DISTANCE 200
+#define L_PRESS 1000 //1 seconds
+#define H_PRESS 3000 //3 seconds
 
 /* Arduino pin declarations */
 const int backLight = 8;
@@ -36,25 +40,28 @@ int screenShown = 0;
 int antennaSelection = 0;
 int testSelection = 0;
 
-int currPositionDoubleArm = 0;
 int resetPositionDoubleArm = 0;
-int currPositionSingleArm = 0;
 int resetPositionSingleArm = 0;
 
-long durationDoubleArm;
-int distanceDoubleArm;
-long durationSingleArm;
-int distanceSingleArm;
+unsigned int pingSpeed = 50;
+unsigned long pingTimer;
+
+unsigned long pressedTime = 0;
+unsigned long releasedTime = 0;
+long pressDuration = 0;
 
 /* Declare which fonts we will be using */
 extern uint8_t BigFont[];
 
 /* Remember to change the model parameter to suit your display module! */
-UTFT myGLCD(SSD1963_800480,38,39,40,41);  
+UTFT myGLCD(SSD1963_800480, 38, 39, 40, 41);  
 /* (byte model, int RS, int WR, int CS, int RST, int SER) */
 
 AccelStepper doubleArmMotor(motorInterfaceType, stepPinDoubleArm, dirPinDoubleArm);
 AccelStepper singleArmMotor(motorInterfaceType, stepPinSingleArm, dirPinSingleArm);
+
+NewPing doubleArmDistance(trigPinDoubleArm, echoPinDoubleArm, MAX_DISTANCE);
+NewPing singleArmDistance(trigPinSingleArm, echoPinSingleArm, MAX_DISTANCE);
 
 void displayAntenna(int select) {
   int antenna = select;
@@ -89,33 +96,35 @@ void displayTest(int select) {
   }
 }
 
-void posDirStepperDouble() {
-  currPositionDoubleArm += 1;
-  doubleArmMotor.moveTo(currPositionDoubleArm);
-  doubleArmMotor.run();
+void posDirStepperDouble(AccelStepper motor) {
+  motor.setSpeed(150);
+  motor.runSpeed();
 }
 
-void negDirStepperDouble() {
-  currPositionDoubleArm -= 1;
-  doubleArmMotor.moveTo(currPositionDoubleArm);
-  doubleArmMotor.run();
+void negDirStepperDouble(AccelStepper motor) {
+  motor.setSpeed(-150);
+  motor.runSpeed();
 }
 
-void posDirStepperSingle() {
-  currPositionSingleArm -= 1;
-  singleArmMotor.moveTo(currPositionSingleArm);
-  singleArmMotor.run();
+double getAntennaDistance(NewPing sensor) {
+  if(sensor.check_timer()) {
+    return(sensor.ping_result / US_ROUNDTRIP_CM);
+  }
 }
 
-void negDirStepperSingle() {
-  currPositionSingleArm += 1;
-  singleArmMotor.moveTo(currPositionSingleArm);
-  singleArmMotor.run();
+void extend(const int RPWN, const int LPWN) {
+  digitalWrite(RPWN, HIGH);
+  digitalWrite(LPWN, LOW);
 }
 
-void getAntennaDistance(const int trigPin, const int echoPin, long duration, int distance) {
-  digitalWrite(trigPin, LOW);
-  
+void retract(const int RPWN, const int LPWN) {
+  digitalWrite(RPWN, LOW);
+  digitalWrite(LPWN, HIGH);
+}
+
+void stopActuator(const int RPWN, const int LPWN) {
+  digitalWrite(RPWN, LOW);
+  digitalWrite(LPWN, LOW);
 }
 
 void setup()
@@ -137,11 +146,14 @@ void setup()
   pinMode(trigPinSingleArm, OUTPUT);
   pinMode(echoPinSingleArm, INPUT);
 
-  currPositionDoubleArm = doubleArmMotor.currentPosition();
   resetPositionDoubleArm = doubleArmMotor.currentPosition();
-  currPositionSingleArm = singleArmMotor.currentPosition();
   resetPositionSingleArm = singleArmMotor.currentPosition();
   
+  pingTimer = millis(); //start pings
+
+  stopActuator(rPwnUpper, lPwnUpper);
+  stopActuator(rPwnLower, lPwnLower);
+  stopActuator(rPwnSingle, lPwnSingle);
 }
 
 void loop()
@@ -236,6 +248,20 @@ void loop()
         }
       }
       else {
+        if(blackButton == LOW) {
+          pressedTime = millis();
+        }
+        else {
+          releasedTime = millis();
+        }
+
+        pressDuration = releasedTime - pressedTime;
+
+        if(pressDuration > L_PRESS && pressDuration < H_PRESS) {
+          screenShown = 0;
+          displayCount = 0;
+        }
+
         myGLCD.fillScr(255, 255, 255);
         
         displayAntenna(antennaSelection);
@@ -269,6 +295,20 @@ void loop()
         }
       }
       else {
+        if(blackButton == LOW) {
+          pressedTime = millis();
+        }
+        else {
+          releasedTime = millis();
+        }
+
+        pressDuration = releasedTime - pressedTime;
+
+        if(pressDuration > L_PRESS && pressDuration < H_PRESS) {
+          screenShown = 0;
+          displayCount = 0;
+        }
+
         myGLCD.fillScr(255, 255, 255);
 
         displayAntenna(antennaSelection);
@@ -304,6 +344,20 @@ void loop()
         } 
       }
       else {
+        if(blackButton == LOW) {
+          pressedTime = millis();
+        }
+        else {
+          releasedTime = millis();
+        }
+
+        pressDuration = releasedTime - pressedTime;
+
+        if(pressDuration > L_PRESS && pressDuration < H_PRESS) {
+          screenShown = 0;
+          displayCount = 0;
+        }
+        
         myGLCD.fillScr(255, 255, 255);
 
         displayAntenna(antennaSelection);
@@ -337,6 +391,20 @@ void loop()
         }
       }
       else {
+        if(blackButton == LOW) {
+          pressedTime = millis();
+        }
+        else {
+          releasedTime = millis();
+        }
+
+        pressDuration = releasedTime - pressedTime;
+
+        if(pressDuration > L_PRESS && pressDuration < H_PRESS) {
+          screenShown = 0;
+          displayCount = 0;
+        }
+
         myGLCD.fillScr(255, 255, 255);
 
         displayAntenna(antennaSelection);
