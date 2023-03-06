@@ -3942,7 +3942,7 @@ void stopActuator(const int RPWN, const int LPWN) {
 }
 
 void printHAFNALogo() {
-  drawBitmap();
+  myGLCD.drawBitmap();
 }
 
 void setup()
@@ -4068,7 +4068,7 @@ void loop()
           pressedTime = millis();
           blackButtonPress = 1;
         }
-        else if(blackButton == HIGH && blackButtonPress = 1) {
+        else if(blackButton == HIGH && blackButtonPress == 1) {
           releasedTime = millis();
           blackButtonPress = 0;
         }
@@ -4135,7 +4135,7 @@ void loop()
           pressedTime = millis();
           blackButtonPress = 1;
         }
-        else if(blackButton == HIGH && blackButtonPress = 1) {
+        else if(blackButton == HIGH && blackButtonPress == 1) {
           releasedTime = millis();
           blackButtonPress = 0;
         }
@@ -4203,7 +4203,7 @@ void loop()
           pressedTime = millis();
           blackButtonPress = 1;
         }
-        else if(blackButton == HIGH && blackButtonPress = 1) {
+        else if(blackButton == HIGH && blackButtonPress == 1) {
           releasedTime = millis();
           blackButtonPress = 0;
         }
@@ -4270,7 +4270,7 @@ void loop()
           pressedTime = millis();
           blackButtonPress = 1;
         }
-        else if(blackButton == HIGH && blackButtonPress = 1) {
+        else if(blackButton == HIGH && blackButtonPress == 1) {
           releasedTime = millis();
           blackButtonPress = 0;
         }
