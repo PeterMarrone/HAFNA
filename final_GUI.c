@@ -1,3 +1,4 @@
+#include <math.h>
 #include <UTFT.h>
 #include <AccelStepper.h>
 #include <NewPing.h>
@@ -7,7 +8,7 @@
 #include <avr/pgmspace.h>
 
 #define motorInterfaceType 1
-#define MAX_DISTANCE 200
+#define MAX_DISTANCE 400
 
 /* Arduino pin declarations */
 const int backLight = 8;
@@ -49,6 +50,8 @@ unsigned int pingSpeed = 50;
 unsigned long pingTimer;
 
 int scale = 0;
+
+int distanceAdjustment = 0;
 
 /* Declare which fonts we will be using */
 extern uint8_t BigFont[];
@@ -764,6 +767,12 @@ void displayTest(int select) {
   }
 }
 
+double getArmAngle(Adafruit_LIS3DH Arm) {
+  Arm.read();
+  double value = Arm.y / Arm.z;
+  return(atan(value));
+}
+
 void posDirStepper(AccelStepper motor) {
   motor.setSpeed(150);
   motor.runSpeed();
@@ -775,9 +784,8 @@ void negDirStepper(AccelStepper motor) {
 }
 
 double getAntennaDistance(NewPing sensor) {
-  if(sensor.check_timer()) {
-    return(sensor.ping_result / US_ROUNDTRIP_CM);
-  }
+  unsigned int ping = sensor.ping();
+  return(sensor.convert_cm(ping));
 }
 
 void extend(const int RPWN, const int LPWN) {
@@ -885,17 +893,20 @@ void loop()
         screenShown = 0;
         displayCount = 2;
         testSelection = 2;
+        distanceAdjustment = 0;
       }
 
       if(blackButton == LOW) {
         screenShown = 0;
         displayCount = 0;
+        distanceAdjustment = 0;
       }
         
       if(greenButton == LOW) {
         screenShown = 0;
         displayCount = 2;
         testSelection = 1;
+        distanceAdjustment = 0;
       }
     }
     else {
@@ -930,8 +941,23 @@ void loop()
         }
         else {   
           double refDistance = getAntennaDistance(doubleArmDistance);
+          if(distanceAdjustment == 0) {
+            distanceAdjustment == 1;            
+            if(antennaSelection == 0) {
+              // Alpha
+              refDistance = refDistance - 8.7;
+            }
+            else if(antennaSelection == 1) {
+              // Maverick
+              refDistance = refDistance - 9.7;
+            }
+            else if(antennaSelection == 2) {
+              // Bravo
+              refDistance = refDistance - 9.6;
+            }
+          }
           myGLCD.setColor(255, 255, 255);
-          myGLCD.printNumI(refDistance, 450, 190);
+          myGLCD.printNumI(refDistance, 440, 190);
           myGLCD.print("cm", 475, 190);
           if(redButton == LOW) {
             retract(rPwnUpper, lPwnUpper);
@@ -989,7 +1015,10 @@ void loop()
           displayCount = 0;
         }
         else {   
-          // Insert Angle code
+          double refAngle = getArmAngle(doubleArmAngle);
+          myGLCD.setColor(255, 255, 255);
+          myGLCD.printNumI(refAngle, 440, 190);
+          myGLCD.print("deg", 475, 190);
           if(redButton == LOW) {
             negDirStepper(doubleArmMotor);
             negDirStepper(singleArmMotor);
@@ -1049,9 +1078,24 @@ void loop()
         }
         /* Black button pressed */
         else {   
-          double insdistance = getAntennaDistance(doubleArmDistance);
+          double insDistance = getAntennaDistance(doubleArmDistance);
+          if(distanceAdjustment == 0) {
+            distanceAdjustment == 1;            
+            if(antennaSelection == 0) {
+              // Alpha
+              insDistance = insDistance - 8.7;
+            }
+            else if(antennaSelection == 1) {
+              // Maverick
+              insDistance = insDistance - 9.7;
+            }
+            else if(antennaSelection == 2) {
+              // Bravo
+              insDistance = insDistance - 9.6;
+            }
+          }
           myGLCD.setColor(255, 255, 255);
-          myGLCD.printNumI(insdistance, 450, 190);
+          myGLCD.printNumI(insDistance, 450, 190);
           myGLCD.print("cm", 475, 190);
           if(redButton == LOW) {
             retract(rPwnUpper, lPwnUpper);
@@ -1110,7 +1154,10 @@ void loop()
         }
         /* Black button pressed */
         else {   
-          // Insert Angle code
+          double insAngle = getArmAngle(doubleArmAngle);
+          myGLCD.setColor(255, 255, 255);
+          myGLCD.printNumI(insAngle, 440, 190);
+          myGLCD.print("deg", 475, 190);
           if(redButton == LOW) {
             negDirStepper(doubleArmMotor);
           }
