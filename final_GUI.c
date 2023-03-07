@@ -8,8 +8,6 @@
 
 #define motorInterfaceType 1
 #define MAX_DISTANCE 200
-#define L_PRESS 3000 //1 seconds
-#define H_PRESS 5000 //3 seconds
 
 /* Arduino pin declarations */
 const int backLight = 8;
@@ -44,17 +42,11 @@ int screenShown = 0;
 int antennaSelection = 0;
 int testSelection = 0;
 
-int blackButtonPress = 0;
-
 int resetPositionDoubleArm = 0;
 int resetPositionSingleArm = 0;
 
 unsigned int pingSpeed = 50;
 unsigned long pingTimer;
-
-unsigned long pressedTime = 0;
-unsigned long releasedTime = 0;
-long pressDuration = 0;
 
 const unsigned short HAFNA_Logo[60833] PROGMEM ={
 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,   // 0x0010 (16) pixels
@@ -4063,21 +4055,11 @@ void loop()
   if(testSelection == 1) {
     if(displayCount == 2) {
       if(screenShown == 1) {
-        /* Hold button back to main menu */
-        if(blackButton == LOW) {
-          pressedTime = millis();
-          blackButtonPress = 1;
-        }
-        else if(blackButton == HIGH && blackButtonPress == 1) {
-          releasedTime = millis();
-          blackButtonPress = 0;
-        }
-        pressDuration = releasedTime - pressedTime;
-        if(pressDuration > L_PRESS && pressDuration < H_PRESS) {
+        /* Press all three buttons to return to main menu */
+        if(redButton == LOW && blackButton == LOW && greenButton == LOW) {
           screenShown = 0;
           displayCount = 0;
         }
-        /* Black button pressed */
         else {   
           double distance = getAntennaDistance(doubleArmDistance);
           myGLCD.printNumI(distance, 500, 250);
@@ -4086,12 +4068,10 @@ void loop()
             retract(rPwnSingle, lPwnSingle);
           }
 
-          /* Black button pressed to move to next screen */
+          /* Black button + Green button to move to next screen */
           if(blackButton == LOW) {
-            blackButtonPress = 1;
-            if(greenButton == LOW && blackButtonPress == 1) {
+            if(greenButton == LOW) {
               screenShown = 0;
-              blackButtonPress = 0;
               displayCount = 3;
             }
           }
@@ -4130,21 +4110,11 @@ void loop()
 
     if(displayCount == 3) {
       if(screenShown == 1) {
-        /* Hold button back to main menu */
-        if(blackButton == LOW) {
-          pressedTime = millis();
-          blackButtonPress = 1;
-        }
-        else if(blackButton == HIGH && blackButtonPress == 1) {
-          releasedTime = millis();
-          blackButtonPress = 0;
-        }
-        pressDuration = releasedTime - pressedTime;
-        if(pressDuration > L_PRESS && pressDuration < H_PRESS) {
+        /* Press all three buttons to return to main menu */
+        if(redButton == LOW && blackButton == LOW && greenButton == LOW) {
           screenShown = 0;
           displayCount = 0;
         }
-        /* Black button pressed */
         else {   
           // Insert Angle code
           if(redButton == LOW) {
@@ -4152,12 +4122,10 @@ void loop()
             negDirStepper(singleArmMotor);
           }
 
-          /* Black button single press */
+          /* Black button + Red button to move to next screen */
           if(blackButton == LOW) {
-            blackButtonPress = 1;
-            if(redButton == LOW && blackButtonPress == 1) {
+            if(redButton == LOW) {
               screenShown = 0;
-              blackButtonPress = 0;
               displayCount = 2;
             }
           }
@@ -4198,17 +4166,8 @@ void loop()
   if(testSelection == 2) {
     if(displayCount == 2) {
       if(screenShown == 1) {
-        /* Hold button back to main menu */
-        if(blackButton == LOW) {
-          pressedTime = millis();
-          blackButtonPress = 1;
-        }
-        else if(blackButton == HIGH && blackButtonPress == 1) {
-          releasedTime = millis();
-          blackButtonPress = 0;
-        }
-        pressDuration = releasedTime - pressedTime;
-        if(pressDuration > L_PRESS && pressDuration < H_PRESS) {
+        /* Press all three buttons to return to main menu */
+        if(redButton == LOW && blackButton == LOW && greenButton == LOW) {
           screenShown = 0;
           displayCount = 0;
         }
@@ -4223,10 +4182,8 @@ void loop()
 
           /* Black button pressed to move to next screen */
           if(blackButton == LOW) {
-            blackButtonPress = 1;
-            if(greenButton == LOW && blackButtonPress == 1) {
+            if(greenButton == LOW) {
               screenShown = 0;
-              blackButtonPress = 0;
               displayCount = 3;
             }
           }
@@ -4265,17 +4222,8 @@ void loop()
 
     if(displayCount == 3) {
       if(screenShown == 1) {
-        /* Hold button back to main menu */
-        if(blackButton == LOW) {
-          pressedTime = millis();
-          blackButtonPress = 1;
-        }
-        else if(blackButton == HIGH && blackButtonPress == 1) {
-          releasedTime = millis();
-          blackButtonPress = 0;
-        }
-        pressDuration = releasedTime - pressedTime;
-        if(pressDuration > L_PRESS && pressDuration < H_PRESS) {
+        /* Press all three buttons to return to main menu */
+        if(redButton == LOW && blackButton == LOW && greenButton == LOW) {
           screenShown = 0;
           displayCount = 0;
         }
@@ -4288,10 +4236,8 @@ void loop()
 
           /* Black button single press */
           if(blackButton == LOW) {
-            blackButtonPress = 1;
-            if(redButton == LOW && blackButtonPress == 1) {
+            if(redButton == LOW) {
               screenShown = 0;
-              blackButtonPress = 0;
               displayCount = 2;
             }
           }
