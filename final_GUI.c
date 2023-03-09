@@ -941,24 +941,30 @@ void loop()
         }
         else {   
           double refDistance = getAntennaDistance(doubleArmDistance);
+          double sigDistance = getAntennaDistance(singleArmDistance);
           if(distanceAdjustment == 0) {
             distanceAdjustment == 1;            
             if(antennaSelection == 0) {
               // Alpha
               refDistance = refDistance - 8.7;
+              sigDistance = sigDistance - 8.7;
             }
             else if(antennaSelection == 1) {
               // Maverick
               refDistance = refDistance - 9.7;
+              sigDistance = sigDistance - 9.7;
             }
             else if(antennaSelection == 2) {
               // Bravo
               refDistance = refDistance - 9.6;
+              sigDistance = sigDistance - 9.6;
             }
           }
           myGLCD.setColor(255, 255, 255);
           myGLCD.printNumI(refDistance, 440, 190);
-          myGLCD.print("cm", 475, 190);
+          myGLCD.print("cm (D)", 475, 190);
+          myGLCD.printNumI(sigDistance, 440, 200);
+          myGLCD.print("cm (S)", 475, 200);
           if(redButton == LOW) {
             retract(rPwnUpper, lPwnUpper);
             retract(rPwnSingle, lPwnSingle);
