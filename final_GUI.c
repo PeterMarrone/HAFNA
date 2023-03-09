@@ -1022,9 +1022,12 @@ void loop()
         }
         else {   
           double refAngle = getArmAngle(doubleArmAngle);
+          double sigAngle = getArmAngle(singleArmAngle);
           myGLCD.setColor(255, 255, 255);
           myGLCD.printNumI(refAngle, 440, 190);
-          myGLCD.print("deg", 475, 190);
+          myGLCD.print("deg (D)", 475, 190);
+          myGLCD.printNumI(sigAngle, 440, 200);
+          myGLCD.print("deg (S)", 475, 200);
           if(redButton == LOW) {
             negDirStepper(doubleArmMotor);
             negDirStepper(singleArmMotor);
