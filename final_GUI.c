@@ -739,17 +739,17 @@ void displayAntenna(int select) {
 
   if(antenna == 0) {
     myGLCD.setColor(255, 255, 255);
-    myGLCD.print("Antenna Selected: Alpha", 0, 0);
+    myGLCD.print("Antenna Selected: Alpha", CENTER, 50);
   } 
       
   if(antenna == 1) {
     myGLCD.setColor(255, 255, 255);
-    myGLCD.print("Antenna Selected: Maverick", 0, 0);
+    myGLCD.print("Antenna Selected: Maverick", CENTER, 50);
   }
 
   if(antenna == 2) {
     myGLCD.setColor(255, 255, 255);
-    myGLCD.print("Antenna Selected: Bravo", 0, 0);
+    myGLCD.print("Antenna Selected: Bravo", CENTER, 50);
   }
 }
 
@@ -758,12 +758,12 @@ void displayTest(int select) {
 
   if(test == 1){
     myGLCD.setColor(255, 255, 255);
-    myGLCD.print("Test Selected: Reflection Loss", 0, 15);
+    myGLCD.print("Test Selected: Reflection Loss", CENTER, 75);
   }
 
   if(test == 2) {
     myGLCD.setColor(255, 255, 255);
-    myGLCD.print("Test Selected: Insertion Loss", 0, 15);
+    myGLCD.print("Test Selected: Insertion Loss", CENTER, 75);
   }
 }
 
@@ -961,10 +961,10 @@ void loop()
             }
           }
           myGLCD.setColor(255, 255, 255);
-          myGLCD.printNumI(refDistance, 440, 190);
-          myGLCD.print("cm (D)", 475, 190);
-          myGLCD.printNumI(sigDistance, 440, 200);
-          myGLCD.print("cm (S)", 475, 200);
+          myGLCD.printNumI(refDistance, 420, 180);
+          myGLCD.print("cm(D)", 460, 180);
+          myGLCD.printNumI(sigDistance, 420, 210);
+          myGLCD.print("cm(S)", 460, 210);
           if(redButton == LOW) {
             retract(rPwnUpper, lPwnUpper);
             retract(rPwnSingle, lPwnSingle);
@@ -1024,10 +1024,10 @@ void loop()
           double refAngle = getArmAngle(doubleArmAngle);
           double sigAngle = getArmAngle(singleArmAngle);
           myGLCD.setColor(255, 255, 255);
-          myGLCD.printNumI(refAngle, 440, 190);
-          myGLCD.print("deg (D)", 475, 190);
-          myGLCD.printNumI(sigAngle, 440, 200);
-          myGLCD.print("deg (S)", 475, 200);
+          myGLCD.printNumI(refAngle, 405, 180);
+          myGLCD.print("deg(D)", 445, 180);
+          myGLCD.printNumI(sigAngle, 405, 210);
+          myGLCD.print("deg(S)", 445, 210);
           if(redButton == LOW) {
             negDirStepper(doubleArmMotor);
             negDirStepper(singleArmMotor);
@@ -1104,8 +1104,8 @@ void loop()
             }
           }
           myGLCD.setColor(255, 255, 255);
-          myGLCD.printNumI(insDistance, 450, 190);
-          myGLCD.print("cm", 475, 190);
+          myGLCD.printNumI(insDistance, 420, 190);
+          myGLCD.print("cm(D)", 460, 190);
           if(redButton == LOW) {
             retract(rPwnUpper, lPwnUpper);
             retract(rPwnLower, lPwnLower);
@@ -1165,8 +1165,8 @@ void loop()
         else {   
           double insAngle = getArmAngle(doubleArmAngle);
           myGLCD.setColor(255, 255, 255);
-          myGLCD.printNumI(insAngle, 440, 190);
-          myGLCD.print("deg", 475, 190);
+          myGLCD.printNumI(insAngle, 405, 190);
+          myGLCD.print("deg(D)", 445, 190);
           if(redButton == LOW) {
             negDirStepper(doubleArmMotor);
           }
