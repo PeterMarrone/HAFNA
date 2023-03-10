@@ -774,11 +774,13 @@ double getArmAngle(Adafruit_LIS3DH Arm) {
 }
 
 void posDirStepper(AccelStepper motor) {
+  motor.setAcceleration(50);
   motor.setSpeed(150);
   motor.runSpeed();
 }
 
 void negDirStepper(AccelStepper motor) {
+  motor.setAcceleration(50);
   motor.setSpeed(-150);
   motor.runSpeed();
 }
@@ -789,18 +791,18 @@ double getAntennaDistance(NewPing sensor) {
 }
 
 void extend(const int RPWN, const int LPWN) {
-  digitalWrite(RPWN, HIGH);
-  digitalWrite(LPWN, LOW);
+  analogWrite(RPWN, HIGH);
+  analogWrite(LPWN, LOW);
 }
 
 void retract(const int RPWN, const int LPWN) {
-  digitalWrite(RPWN, LOW);
-  digitalWrite(LPWN, HIGH);
+  analogWrite(RPWN, LOW);
+  analogWrite(LPWN, HIGH);
 }
 
 void stopActuator(const int RPWN, const int LPWN) {
-  digitalWrite(RPWN, LOW);
-  digitalWrite(LPWN, LOW);
+  analogWrite(RPWN, LOW);
+  analogWrite(LPWN, LOW);
 }
 
 void drawHAFNA(int scale) {
@@ -982,6 +984,9 @@ void loop()
             extend(rPwnUpper, lPwnUpper);
             extend(rPwnSingle, lPwnSingle);
           }
+
+          stopActuator(rPwnUpper, lPwnUpper);
+          stopActuator(rPwnSingle, lPwnSingle);
         }
       }
       else {
@@ -1123,6 +1128,9 @@ void loop()
             extend(rPwnUpper, lPwnUpper);
             extend(rPwnLower, lPwnLower);
           }
+
+          stopActuator(rPwnUpper, lPwnUpper);
+          stopActuator(rPwnLower, lPwnLower);
         }
       }
       else {
