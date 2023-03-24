@@ -791,18 +791,18 @@ double getAntennaDistance(NewPing sensor) {
 }
 
 void extend(const int RPWN, const int LPWN) {
-  analogWrite(RPWN, HIGH);
-  analogWrite(LPWN, LOW);
+  digitalWrite(RPWN, HIGH);
+  digitalWrite(LPWN, LOW);
 }
 
 void retract(const int RPWN, const int LPWN) {
-  analogWrite(RPWN, LOW);
-  analogWrite(LPWN, HIGH);
+  digitalWrite(RPWN, LOW);
+  digitalWrite(LPWN, HIGH);
 }
 
 void stopActuator(const int RPWN, const int LPWN) {
-  analogWrite(RPWN, LOW);
-  analogWrite(LPWN, LOW);
+  digitalWrite(RPWN, LOW);
+  digitalWrite(LPWN, LOW);
 }
 
 void drawHAFNA(int scale) {
@@ -828,10 +828,27 @@ void setup()
   pinMode(trigPinSingleArm, OUTPUT);
   pinMode(echoPinSingleArm, INPUT);
 
+  pinMode(dirPinDoubleArm, OUTPUT);
+  pinMode(stepPinDoubleArm, OUTPUT);
+  pinMode(dirPinSingleArm, OUTPUT);
+  pinMode(stepPinSingleArm, OUTPUT);
+
+  pinMode(lPwnUpper, OUTPUT);
+  pinMode(rPwnUpper, OUTPUT);
+  pinMode(lPwnLower, OUTPUT);
+  pinMode(rPwnLower, OUTPUT);
+  pinMode(lPwnSingle, OUTPUT);
+  pinMode(rPwnSingle, OUTPUT);
+
   resetPositionDoubleArm = doubleArmMotor.currentPosition();
   resetPositionSingleArm = singleArmMotor.currentPosition();
   
   pingTimer = millis(); //start pings
+
+  doubleArmMotor.setMaxSpeed(150);
+  doubleArmMotor.setAcceleration(50);
+  singleArmMotor.setMaxSpeed(150);
+  singleArmMotor.setAcceleration(50);
 
   stopActuator(rPwnUpper, lPwnUpper);
   stopActuator(rPwnLower, lPwnLower);
@@ -971,22 +988,21 @@ void loop()
             retract(rPwnUpper, lPwnUpper);
             retract(rPwnSingle, lPwnSingle);
           }
-
           /* Black button + Green button to move to next screen */
-          if(blackButton == LOW) {
+          else if(blackButton == LOW) {
             if(greenButton == LOW) {
               screenShown = 0;
               displayCount = 3;
             }
           }
-
-          if(greenButton == LOW) {
+          else if(greenButton == LOW) {
             extend(rPwnUpper, lPwnUpper);
             extend(rPwnSingle, lPwnSingle);
           }
-
-          stopActuator(rPwnUpper, lPwnUpper);
-          stopActuator(rPwnSingle, lPwnSingle);
+          else {
+            stopActuator(rPwnUpper, lPwnUpper);
+            stopActuator(rPwnSingle, lPwnSingle);
+          }
         }
       }
       else {
@@ -1115,22 +1131,21 @@ void loop()
             retract(rPwnUpper, lPwnUpper);
             retract(rPwnLower, lPwnLower);
           }
-
           /* Black button pressed to move to next screen */
-          if(blackButton == LOW) {
+          else if(blackButton == LOW) {
             if(greenButton == LOW) {
               screenShown = 0;
               displayCount = 3;
             }
           }
-
-          if(greenButton == LOW) {
+          else if(greenButton == LOW) {
             extend(rPwnUpper, lPwnUpper);
             extend(rPwnLower, lPwnLower);
           }
-
-          stopActuator(rPwnUpper, lPwnUpper);
-          stopActuator(rPwnLower, lPwnLower);
+          else {
+            stopActuator(rPwnUpper, lPwnUpper);
+            stopActuator(rPwnLower, lPwnLower);
+          }
         }
       }
       else {
