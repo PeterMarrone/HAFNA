@@ -773,18 +773,6 @@ double getArmAngle(Adafruit_LIS3DH Arm) {
   return(atan(value));
 }
 
-void posDirStepper(AccelStepper motor) {
-  motor.setAcceleration(50);
-  motor.setSpeed(150);
-  motor.runSpeed();
-}
-
-void negDirStepper(AccelStepper motor) {
-  motor.setAcceleration(50);
-  motor.setSpeed(-150);
-  motor.runSpeed();
-}
-
 double getAntennaDistance(NewPing sensor) {
   unsigned int ping = sensor.ping();
   return(sensor.convert_cm(ping));
@@ -830,6 +818,7 @@ void setup()
 
   pinMode(dirPinDoubleArm, OUTPUT);
   pinMode(stepPinDoubleArm, OUTPUT);
+  
   pinMode(dirPinSingleArm, OUTPUT);
   pinMode(stepPinSingleArm, OUTPUT);
 
@@ -842,13 +831,14 @@ void setup()
 
   resetPositionDoubleArm = doubleArmMotor.currentPosition();
   resetPositionSingleArm = singleArmMotor.currentPosition();
-  
-  pingTimer = millis(); //start pings
 
   doubleArmMotor.setMaxSpeed(150);
   doubleArmMotor.setAcceleration(50);
+
   singleArmMotor.setMaxSpeed(150);
   singleArmMotor.setAcceleration(50);
+  
+  pingTimer = millis(); //start pings
 
   stopActuator(rPwnUpper, lPwnUpper);
   stopActuator(rPwnLower, lPwnLower);
@@ -961,6 +951,7 @@ void loop()
         else {   
           double refDistance = getAntennaDistance(doubleArmDistance);
           double sigDistance = getAntennaDistance(singleArmDistance);
+
           if(distanceAdjustment == 0) {
             distanceAdjustment == 1;            
             if(antennaSelection == 0) {
@@ -979,11 +970,13 @@ void loop()
               sigDistance = sigDistance - 9.6;
             }
           }
+
           myGLCD.setColor(255, 255, 255);
           myGLCD.printNumI(refDistance, 420, 180);
           myGLCD.print("cm(D)", 460, 180);
           myGLCD.printNumI(sigDistance, 420, 210);
           myGLCD.print("cm(S)", 460, 210);
+
           if(redButton == LOW) {
             retract(rPwnUpper, lPwnUpper);
             retract(rPwnSingle, lPwnSingle);
@@ -1049,9 +1042,12 @@ void loop()
           myGLCD.print("deg(D)", 445, 180);
           myGLCD.printNumI(sigAngle, 405, 210);
           myGLCD.print("deg(S)", 445, 210);
+
           if(redButton == LOW) {
-            negDirStepper(doubleArmMotor);
-            negDirStepper(singleArmMotor);
+            doubleArmMotor.setSpeed(-150);
+            singleArmMotor.setSpeed(-150);
+            singleArmMotor.runSpeed(); 
+            doubleArmMotor.runSpeed();   
           }
 
           /* Black button + Red button to move to next screen */
@@ -1063,8 +1059,10 @@ void loop()
           }
 
           if(greenButton == LOW) {
-            posDirStepper(doubleArmMotor);
-            posDirStepper(singleArmMotor);
+            doubleArmMotor.setSpeed(150);
+            singleArmMotor.setSpeed(150);
+            singleArmMotor.runSpeed();
+            doubleArmMotor.runSpeed();
           }
         }
       }
@@ -1109,6 +1107,7 @@ void loop()
         /* Black button pressed */
         else {   
           double insDistance = getAntennaDistance(doubleArmDistance);
+
           if(distanceAdjustment == 0) {
             distanceAdjustment == 1;            
             if(antennaSelection == 0) {
@@ -1124,9 +1123,11 @@ void loop()
               insDistance = insDistance - 9.6;
             }
           }
+
           myGLCD.setColor(255, 255, 255);
           myGLCD.printNumI(insDistance, 420, 190);
           myGLCD.print("cm(D)", 460, 190);
+
           if(redButton == LOW) {
             retract(rPwnUpper, lPwnUpper);
             retract(rPwnLower, lPwnLower);
@@ -1191,7 +1192,8 @@ void loop()
           myGLCD.printNumI(insAngle, 405, 190);
           myGLCD.print("deg(D)", 445, 190);
           if(redButton == LOW) {
-            negDirStepper(doubleArmMotor);
+            doubleArmMotor.setSpeed(-150);
+            doubleArmMotor.runSpeed();
           }
 
           /* Black button single press */
@@ -1203,7 +1205,8 @@ void loop()
           }
 
           if(greenButton == LOW) {
-            posDirStepper(doubleArmMotor);
+            doubleArmMotor.setSpeed(150);
+            doubleArmMotor.runSpeed();
           }
         }
       }
