@@ -8,7 +8,7 @@
 #include <avr/pgmspace.h>
 
 #define motorInterfaceType 1
-#define MAX_DISTANCE 400
+#define MAX_DISTANCE 500
 
 /* Arduino pin declarations */
 const int backLight = 8;
@@ -775,7 +775,7 @@ double getArmAngle(Adafruit_LIS3DH Arm) {
 
 double getAntennaDistance(NewPing sensor) {
   unsigned int ping = sensor.ping();
-  return(sensor.convert_cm(ping));
+  return(sensor.convert_cm(ping) / 2.54);
 }
 
 void extend(const int RPWN, const int LPWN) {
@@ -893,6 +893,8 @@ void loop()
       myGLCD.fillCircle(550, 400, 50);
       myGLCD.print("Bravo", 510, 325);
       screenShown = 1;
+
+      double 
     }
   }
 
@@ -956,26 +958,26 @@ void loop()
             distanceAdjustment == 1;            
             if(antennaSelection == 0) {
               // Alpha
-              refDistance = refDistance - 8.7;
-              sigDistance = sigDistance - 8.7;
+              refDistance = refDistance - 3.42;
+              sigDistance = sigDistance - 3.42;
             }
             else if(antennaSelection == 1) {
               // Maverick
-              refDistance = refDistance - 9.7;
-              sigDistance = sigDistance - 9.7;
+              refDistance = refDistance - 3.81;
+              sigDistance = sigDistance - 3.81;
             }
             else if(antennaSelection == 2) {
               // Bravo
-              refDistance = refDistance - 9.6;
-              sigDistance = sigDistance - 9.6;
+              refDistance = refDistance - 3.78;
+              sigDistance = sigDistance - 3.78;
             }
           }
 
           myGLCD.setColor(255, 255, 255);
           myGLCD.printNumI(refDistance, 420, 180);
-          myGLCD.print("cm(D)", 460, 180);
+          myGLCD.print("in(D)", 460, 180);
           myGLCD.printNumI(sigDistance, 420, 210);
-          myGLCD.print("cm(S)", 460, 210);
+          myGLCD.print("in(S)", 460, 210);
 
           if(redButton == LOW) {
             retract(rPwnUpper, lPwnUpper);
@@ -1046,23 +1048,20 @@ void loop()
           if(redButton == LOW) {
             doubleArmMotor.setSpeed(-150);
             singleArmMotor.setSpeed(-150);
-            singleArmMotor.runSpeed(); 
-            doubleArmMotor.runSpeed();   
+            
+            doubleArmMotor.runSpeed(); 
+            singleArmMotor.runSpeed();
           }
-
           /* Black button + Red button to move to next screen */
-          if(blackButton == LOW) {
+          else if(blackButton == LOW) {
             if(redButton == LOW) {
               screenShown = 0;
               displayCount = 2;
             }
           }
-
-          if(greenButton == LOW) {
-            doubleArmMotor.setSpeed(150);
-            singleArmMotor.setSpeed(150);
-            singleArmMotor.runSpeed();
+          else if(greenButton == LOW) {
             doubleArmMotor.runSpeed();
+            singleArmMotor.runSpeed();
           }
         }
       }
@@ -1112,21 +1111,21 @@ void loop()
             distanceAdjustment == 1;            
             if(antennaSelection == 0) {
               // Alpha
-              insDistance = insDistance - 8.7;
+              insDistance = insDistance - 3.42;
             }
             else if(antennaSelection == 1) {
               // Maverick
-              insDistance = insDistance - 9.7;
+              insDistance = insDistance - 3.81;
             }
             else if(antennaSelection == 2) {
               // Bravo
-              insDistance = insDistance - 9.6;
+              insDistance = insDistance - 3.78;
             }
           }
 
           myGLCD.setColor(255, 255, 255);
           myGLCD.printNumI(insDistance, 420, 190);
-          myGLCD.print("cm(D)", 460, 190);
+          myGLCD.print("in(D)", 460, 190);
 
           if(redButton == LOW) {
             retract(rPwnUpper, lPwnUpper);
@@ -1180,6 +1179,12 @@ void loop()
 
     if(displayCount == 3) {
       if(screenShown == 1) {
+
+        double testAngle = getArmAngle(doubleArmAngle);
+        while(testAngle < 60.0) {
+          doubleArmMotor.runSpeed();
+        }
+        
         /* Press all three buttons to return to main menu */
         if(redButton == LOW && blackButton == LOW && greenButton == LOW) {
           screenShown = 0;
@@ -1191,21 +1196,19 @@ void loop()
           myGLCD.setColor(255, 255, 255);
           myGLCD.printNumI(insAngle, 405, 190);
           myGLCD.print("deg(D)", 445, 190);
+
           if(redButton == LOW) {
             doubleArmMotor.setSpeed(-150);
             doubleArmMotor.runSpeed();
           }
-
           /* Black button single press */
-          if(blackButton == LOW) {
+          else if(blackButton == LOW) {
             if(redButton == LOW) {
               screenShown = 0;
               displayCount = 2;
             }
           }
-
-          if(greenButton == LOW) {
-            doubleArmMotor.setSpeed(150);
+          else if(greenButton == LOW) {
             doubleArmMotor.runSpeed();
           }
         }
