@@ -31,8 +31,8 @@ const int echoPinSingleArm = 60;
 
 const int dirPinDoubleArm = 62;
 const int stepPinDoubleArm = 63;
-const int dirPinSingleArm = 64;
-const int stepPinSingleArm = 65;
+//const int dirPinSingleArm = 64;
+//const int stepPinSingleArm = 65;
 
 unsigned long previousMillis = 0UL;
 unsigned long interval = 10000UL;
@@ -726,7 +726,6 @@ UTFT myGLCD(SSD1963_800480, 38, 39, 40, 41);
 /* (byte model, int RS, int WR, int CS, int RST, int SER) */
 
 AccelStepper doubleArmMotor(motorInterfaceType, stepPinDoubleArm, dirPinDoubleArm);
-AccelStepper singleArmMotor(motorInterfaceType, stepPinSingleArm, dirPinSingleArm);
 
 NewPing doubleArmDistance(trigPinDoubleArm, echoPinDoubleArm, MAX_DISTANCE);
 NewPing singleArmDistance(trigPinSingleArm, echoPinSingleArm, MAX_DISTANCE);
@@ -830,13 +829,9 @@ void setup()
   pinMode(rPwnSingle, OUTPUT);
 
   resetPositionDoubleArm = doubleArmMotor.currentPosition();
-  resetPositionSingleArm = singleArmMotor.currentPosition();
 
   doubleArmMotor.setMaxSpeed(150);
   doubleArmMotor.setAcceleration(50);
-
-  singleArmMotor.setMaxSpeed(150);
-  singleArmMotor.setAcceleration(50);
   
   pingTimer = millis(); //start pings
 
@@ -1046,22 +1041,20 @@ void loop()
           myGLCD.print("deg(S)", 445, 210);
 
           if(redButton == LOW) {
-            doubleArmMotor.setSpeed(-150);
-            singleArmMotor.setSpeed(-150);
-            
+            doubleArmMotor.setSpeed(-150); 
             doubleArmMotor.runSpeed(); 
-            singleArmMotor.runSpeed();
           }
+
           /* Black button + Red button to move to next screen */
-          else if(blackButton == LOW) {
+          if(blackButton == LOW) {
             if(redButton == LOW) {
               screenShown = 0;
               displayCount = 2;
             }
           }
-          else if(greenButton == LOW) {
+          
+          if(greenButton == LOW) {
             doubleArmMotor.runSpeed();
-            singleArmMotor.runSpeed();
           }
         }
       }
@@ -1179,12 +1172,6 @@ void loop()
 
     if(displayCount == 3) {
       if(screenShown == 1) {
-
-        double testAngle = getArmAngle(doubleArmAngle);
-        while(testAngle < 60.0) {
-          doubleArmMotor.runSpeed();
-        }
-        
         /* Press all three buttons to return to main menu */
         if(redButton == LOW && blackButton == LOW && greenButton == LOW) {
           screenShown = 0;
@@ -1201,14 +1188,16 @@ void loop()
             doubleArmMotor.setSpeed(-150);
             doubleArmMotor.runSpeed();
           }
+
           /* Black button single press */
-          else if(blackButton == LOW) {
+          if(blackButton == LOW) {
             if(redButton == LOW) {
               screenShown = 0;
               displayCount = 2;
             }
           }
-          else if(greenButton == LOW) {
+
+          if(greenButton == LOW) {
             doubleArmMotor.runSpeed();
           }
         }
