@@ -29,10 +29,8 @@ const int echoPinDoubleArm = 58;
 const int trigPinSingleArm = 59;
 const int echoPinSingleArm = 60;
 
-const int dirPinDoubleArm = 62;
-const int stepPinDoubleArm = 63;
-//const int dirPinSingleArm = 64;
-//const int stepPinSingleArm = 65;
+const int dirPin = 62;
+const int stepPin = 63;
 
 unsigned long previousMillis = 0UL;
 unsigned long interval = 10000UL;
@@ -725,7 +723,7 @@ const unsigned short HAFNA[10600] PROGMEM={
 UTFT myGLCD(SSD1963_800480, 38, 39, 40, 41);  
 /* (byte model, int RS, int WR, int CS, int RST, int SER) */
 
-AccelStepper doubleArmMotor(motorInterfaceType, stepPinDoubleArm, dirPinDoubleArm);
+AccelStepper doubleArmMotor(motorInterfaceType, stepPin, dirPin);
 
 NewPing doubleArmDistance(trigPinDoubleArm, echoPinDoubleArm, MAX_DISTANCE);
 NewPing singleArmDistance(trigPinSingleArm, echoPinSingleArm, MAX_DISTANCE);
@@ -827,8 +825,6 @@ void setup()
   pinMode(rPwnLower, OUTPUT);
   pinMode(lPwnSingle, OUTPUT);
   pinMode(rPwnSingle, OUTPUT);
-
-  resetPositionDoubleArm = doubleArmMotor.currentPosition();
 
   doubleArmMotor.setMaxSpeed(150);
   doubleArmMotor.setAcceleration(50);
@@ -1032,13 +1028,6 @@ void loop()
           displayCount = 0;
         }
         else {   
-          double refAngle = getArmAngle(doubleArmAngle);
-          double sigAngle = getArmAngle(singleArmAngle);
-          myGLCD.setColor(255, 255, 255);
-          myGLCD.printNumI(refAngle, 405, 180);
-          myGLCD.print("deg(D)", 445, 180);
-          myGLCD.printNumI(sigAngle, 405, 210);
-          myGLCD.print("deg(S)", 445, 210);
 
           if(redButton == LOW) {
             doubleArmMotor.setSpeed(-150); 
@@ -1046,15 +1035,25 @@ void loop()
           }
 
           /* Black button + Red button to move to next screen */
-          if(blackButton == LOW) {
+          else if(blackButton == LOW) {
             if(redButton == LOW) {
               screenShown = 0;
               displayCount = 2;
             }
           }
           
-          if(greenButton == LOW) {
+          else if(greenButton == LOW) {
+            doubleArmMotor.setSpeed(150);
             doubleArmMotor.runSpeed();
+          }
+          else {
+            double refAngle = getArmAngle(doubleArmAngle);
+            double sigAngle = getArmAngle(singleArmAngle);
+            myGLCD.setColor(255, 255, 255);
+            myGLCD.printNumI(refAngle, 405, 180);
+            myGLCD.print("deg(D)", 445, 180);
+            myGLCD.printNumI(sigAngle, 405, 210);
+            myGLCD.print("deg(S)", 445, 210);
           }
         }
       }
@@ -1179,10 +1178,6 @@ void loop()
         }
         /* Black button pressed */
         else {   
-          double insAngle = getArmAngle(doubleArmAngle);
-          myGLCD.setColor(255, 255, 255);
-          myGLCD.printNumI(insAngle, 405, 190);
-          myGLCD.print("deg(D)", 445, 190);
 
           if(redButton == LOW) {
             doubleArmMotor.setSpeed(-150);
@@ -1190,15 +1185,22 @@ void loop()
           }
 
           /* Black button single press */
-          if(blackButton == LOW) {
+          else if(blackButton == LOW) {
             if(redButton == LOW) {
               screenShown = 0;
               displayCount = 2;
             }
           }
 
-          if(greenButton == LOW) {
+          else if(greenButton == LOW) {
+            doubleArmMotor.setSpeed(150);
             doubleArmMotor.runSpeed();
+          }
+          else {
+            double insAngle = getArmAngle(doubleArmAngle);
+            myGLCD.setColor(255, 255, 255);
+            myGLCD.printNumI(insAngle, 405, 190);
+            myGLCD.print("deg(D)", 445, 190);
           }
         }
       }
