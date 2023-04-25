@@ -934,6 +934,30 @@ void loop()
   }
 
   if(testSelection == 1) {
+    double setupDoubleDistance = getAntennaDistance(doubleArmDistance);
+    double setupSingleDistance = getAntennaDistance(singleArmDistance);
+
+    if(setupDoubleDistance < 7.0) {
+      extend(rPwnUpper, lPwnUpper);
+    }
+    else if(setupDoubleDistance > 7.0) {
+      retract(rPwnUpper, lPwnUpper);
+    }
+    else {
+      stopActuator(rPwnUpper, lPwnUpper);
+    }
+
+    if(setupSingleDistance < 7.0) {
+      extend(rPwnSingle, lPwnSingle);
+    }
+    else if(setupSingleDistance > 7.0) {
+      retract(rPwnSingle, lPwnSingle);
+    }
+    else {
+      stopActuator(rPwnSingle, lPwnSingle);
+    }
+
+
     if(displayCount == 2) {
       if(screenShown == 1) {
         /* Press all three buttons to return to main menu */
@@ -972,6 +996,7 @@ void loop()
 
           if(redButton == LOW) {
             retract(rPwnUpper, lPwnUpper);
+            retract(rPwnLower, lPwnLower);
             retract(rPwnSingle, lPwnSingle);
           }
           /* Black button + Green button to move to next screen */
@@ -983,10 +1008,12 @@ void loop()
           }
           else if(greenButton == LOW) {
             extend(rPwnUpper, lPwnUpper);
+            extend(rPwnLower, lPwnLower);
             extend(rPwnSingle, lPwnSingle);
           }
           else {
             stopActuator(rPwnUpper, lPwnUpper);
+            stopActuator(rPwnLower, lPwnLower);
             stopActuator(rPwnSingle, lPwnSingle);
           }
         }
@@ -1088,6 +1115,22 @@ void loop()
   }
 
   if(testSelection == 2) {
+
+    double setupInsetionDistance = getAntennaDistance(doubleArmDistance);
+
+    if(setupInsetionDistance < 7.0) {
+      extend(rPwnUpper, lPwnUpper);
+      extend(rPwnLower, lPwnLower);
+    }
+    else if {
+      retract(rPwnUpper, lPwnUpper);
+      retract(rPwnLower, lPwnLower);
+    }
+    else {
+      stopActuator(rPwnUpper, lPwnUpper);
+      stopActuator(rPwnLower, lPwnLower);
+    }
+
     if(displayCount == 2) {
       if(screenShown == 1) {
         /* Press all three buttons to return to main menu */
