@@ -813,11 +813,8 @@ void setup()
   pinMode(trigPinSingleArm, OUTPUT);
   pinMode(echoPinSingleArm, INPUT);
 
-  pinMode(dirPinDoubleArm, OUTPUT);
-  pinMode(stepPinDoubleArm, OUTPUT);
-  
-  pinMode(dirPinSingleArm, OUTPUT);
-  pinMode(stepPinSingleArm, OUTPUT);
+  pinMode(dirPin, OUTPUT);
+  pinMode(stepPin, OUTPUT);
 
   pinMode(lPwnUpper, OUTPUT);
   pinMode(rPwnUpper, OUTPUT);
@@ -884,8 +881,6 @@ void loop()
       myGLCD.fillCircle(550, 400, 50);
       myGLCD.print("Bravo", 510, 325);
       screenShown = 1;
-
-      double 
     }
   }
 
@@ -1116,13 +1111,13 @@ void loop()
 
   if(testSelection == 2) {
 
-    double setupInsetionDistance = getAntennaDistance(doubleArmDistance);
+    double setupInsertionDistance = getAntennaDistance(doubleArmDistance);
 
-    if(setupInsetionDistance < 7.0) {
+    if(setupInsertionDistance < 7.0) {
       extend(rPwnUpper, lPwnUpper);
       extend(rPwnLower, lPwnLower);
     }
-    else if {
+    else if(setupInsertionDistance > 7.0) {
       retract(rPwnUpper, lPwnUpper);
       retract(rPwnLower, lPwnLower);
     }
