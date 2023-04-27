@@ -8,7 +8,7 @@
 #include <avr/pgmspace.h>
 
 #define motorInterfaceType 1
-#define MAX_DISTANCE 500
+#define MAX_DISTANCE 800
 
 /* Arduino pin declarations */
 const int backLight = 8;
@@ -37,6 +37,7 @@ unsigned long interval = 10000UL;
 
 int displayCount = 0;
 int screenShown = 0;
+int setupComplete = 0;
 
 int antennaSelection = 0;
 int testSelection = 0;
@@ -766,8 +767,22 @@ void displayTest(int select) {
 
 double getArmAngle(Adafruit_LIS3DH Arm) {
   Arm.read();
-  double value = Arm.y / Arm.z;
-  return(atan(value));
+
+  double printValue = 0;
+  double value = atan(sqrt(pow(Arm.x_g,2) + pow(Arm.y_g,2)) / Arm.z_g) * 57.3;
+
+  if(value < 5.00) {
+    printValue = 0;
+  }
+  else {
+    printValue = value;
+  }
+
+  if(printValue < 0) {
+    printValue = -printValue;
+  }
+
+  return(printValue);
 }
 
 double getAntennaDistance(NewPing sensor) {
@@ -888,6 +903,7 @@ void loop()
     if(screenShown == 1) {
       if(redButton == LOW) {
         screenShown = 0;
+        setupComplete = 0;
         displayCount = 2;
         testSelection = 2;
         distanceAdjustment = 0;
@@ -901,6 +917,7 @@ void loop()
         
       if(greenButton == LOW) {
         screenShown = 0;
+        setupComplete = 0;
         displayCount = 2;
         testSelection = 1;
         distanceAdjustment = 0;
@@ -929,30 +946,31 @@ void loop()
   }
 
   if(testSelection == 1) {
-    double setupDoubleDistance = getAntennaDistance(doubleArmDistance);
-    double setupSingleDistance = getAntennaDistance(singleArmDistance);
+    if(setupComplete == 0) {
+      double setupDoubleDistance = getAntennaDistance(doubleArmDistance);
+      double setupSingleDistance = getAntennaDistance(singleArmDistance);
 
-    if(setupDoubleDistance < 7.0) {
-      extend(rPwnUpper, lPwnUpper);
-    }
-    else if(setupDoubleDistance > 7.0) {
-      retract(rPwnUpper, lPwnUpper);
-    }
-    else {
-      stopActuator(rPwnUpper, lPwnUpper);
-    }
+      if(setupDoubleDistance < 15.0) {
+        extend(rPwnUpper, lPwnUpper);
+      }
+      else if(setupDoubleDistance > 15.0) {
+        retract(rPwnUpper, lPwnUpper);
+      }
+      else {
+        stopActuator(rPwnUpper, lPwnUpper);
+      }
 
-    if(setupSingleDistance < 7.0) {
-      extend(rPwnSingle, lPwnSingle);
-    }
-    else if(setupSingleDistance > 7.0) {
-      retract(rPwnSingle, lPwnSingle);
-    }
-    else {
-      stopActuator(rPwnSingle, lPwnSingle);
-    }
+      if(setupSingleDistance < 15.0) {
+        extend(rPwnSingle, lPwnSingle);
+      }
+      else if(setupSingleDistance > 15.0) {
+        retract(rPwnSingle, lPwnSingle);
+      }
+      else {
+        stopActuator(rPwnSingle, lPwnSingle);
+      }
 
-
+    }
     if(displayCount == 2) {
       if(screenShown == 1) {
         /* Press all three buttons to return to main menu */
@@ -960,7 +978,9 @@ void loop()
           screenShown = 0;
           displayCount = 0;
         }
-        else {   
+        else {
+          setupComplete = 1;
+
           double refDistance = getAntennaDistance(doubleArmDistance);
           double sigDistance = getAntennaDistance(singleArmDistance);
 
@@ -984,9 +1004,9 @@ void loop()
           }
 
           myGLCD.setColor(255, 255, 255);
-          myGLCD.printNumI(refDistance, 420, 180);
+          myGLCD.printNumF(refDistance, 420, 180, '.', 3, ' ');
           myGLCD.print("in(D)", 460, 180);
-          myGLCD.printNumI(sigDistance, 420, 210);
+          myGLCD.printNumF(sigDistance, 420, 210, '.', 3, ' ');
           myGLCD.print("in(S)", 460, 210);
 
           if(redButton == LOW) {
@@ -1055,7 +1075,6 @@ void loop()
             doubleArmMotor.setSpeed(-150); 
             doubleArmMotor.runSpeed(); 
           }
-
           /* Black button + Red button to move to next screen */
           else if(blackButton == LOW) {
             if(redButton == LOW) {
@@ -1063,18 +1082,18 @@ void loop()
               displayCount = 2;
             }
           }
-          
           else if(greenButton == LOW) {
             doubleArmMotor.setSpeed(150);
             doubleArmMotor.runSpeed();
           }
           else {
-            double refAngle = getArmAngle(doubleArmAngle);
+            double doubleAngle = getArmAngle(doubleArmAngle);
             double sigAngle = getArmAngle(singleArmAngle);
+
             myGLCD.setColor(255, 255, 255);
-            myGLCD.printNumI(refAngle, 405, 180);
+            myGLCD.printNumF(doubleAngle, 400, 180, '.', 3, ' ');
             myGLCD.print("deg(D)", 445, 180);
-            myGLCD.printNumI(sigAngle, 405, 210);
+            myGLCD.printNumF(sigAngle, 400, 210, '.', 3, ' ');
             myGLCD.print("deg(S)", 445, 210);
           }
         }
@@ -1110,22 +1129,22 @@ void loop()
   }
 
   if(testSelection == 2) {
+    if(setupComplete == 0) {
+      double setupInsertionDistance = getAntennaDistance(doubleArmDistance);
 
-    double setupInsertionDistance = getAntennaDistance(doubleArmDistance);
-
-    if(setupInsertionDistance < 7.0) {
-      extend(rPwnUpper, lPwnUpper);
-      extend(rPwnLower, lPwnLower);
+      if(setupInsertionDistance < 15.0) {
+        extend(rPwnUpper, lPwnUpper);
+        extend(rPwnLower, lPwnLower);
+      }
+      else if(setupInsertionDistance > 15.0) {
+        retract(rPwnUpper, lPwnUpper);
+        retract(rPwnLower, lPwnLower);
+      }
+      else {
+        stopActuator(rPwnUpper, lPwnUpper);
+        stopActuator(rPwnLower, lPwnLower);
+      }
     }
-    else if(setupInsertionDistance > 7.0) {
-      retract(rPwnUpper, lPwnUpper);
-      retract(rPwnLower, lPwnLower);
-    }
-    else {
-      stopActuator(rPwnUpper, lPwnUpper);
-      stopActuator(rPwnLower, lPwnLower);
-    }
-
     if(displayCount == 2) {
       if(screenShown == 1) {
         /* Press all three buttons to return to main menu */
@@ -1134,7 +1153,9 @@ void loop()
           displayCount = 0;
         }
         /* Black button pressed */
-        else {   
+        else { 
+          setupComplete = 1;
+
           double insDistance = getAntennaDistance(doubleArmDistance);
 
           if(distanceAdjustment == 0) {
@@ -1154,8 +1175,8 @@ void loop()
           }
 
           myGLCD.setColor(255, 255, 255);
-          myGLCD.printNumI(insDistance, 420, 190);
-          myGLCD.print("in(D)", 460, 190);
+          myGLCD.printNumF(insDistance, 420, 190, '.', 3, ' ');
+          myGLCD.print("in", 460, 190);
 
           if(redButton == LOW) {
             retract(rPwnUpper, lPwnUpper);
@@ -1237,8 +1258,8 @@ void loop()
           else {
             double insAngle = getArmAngle(doubleArmAngle);
             myGLCD.setColor(255, 255, 255);
-            myGLCD.printNumI(insAngle, 405, 190);
-            myGLCD.print("deg(D)", 445, 190);
+            myGLCD.printNumF(insAngle, 405, 190, '.', 3, ' ');
+            myGLCD.print("deg", 445, 190);
           }
         }
       }
