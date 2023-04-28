@@ -8,7 +8,7 @@
 #include <avr/pgmspace.h>
 
 #define motorInterfaceType 1
-#define MAX_DISTANCE 800
+#define MAX_DISTANCE 600
 
 /* Arduino pin declarations */
 const int backLight = 8;
@@ -37,7 +37,6 @@ unsigned long interval = 10000UL;
 
 int displayCount = 0;
 int screenShown = 0;
-int setupComplete = 0;
 
 int antennaSelection = 0;
 int testSelection = 0;
@@ -847,8 +846,8 @@ void setup()
   stopActuator(rPwnLower, lPwnLower);
   stopActuator(rPwnSingle, lPwnSingle);
 
-  doubleArmAngle.begin(0x18);
-  singleArmAngle.begin(0x19);
+  doubleArmAngle.begin(0x19);
+  singleArmAngle.begin(0x18);
 }
 
 void loop()
@@ -895,6 +894,16 @@ void loop()
       myGLCD.setColor(0, 255, 0);
       myGLCD.fillCircle(550, 400, 50);
       myGLCD.print("Bravo", 510, 325);
+
+      double setupDistance = getAntennaDistance(doubleArmDistance);
+      
+      while(setupDistance < 10.0) {
+        /* Retracts arms at beginning of program */
+        retract(rPwnUpper, lPwnUpper);
+        retract(rPwnLower, lPwnLower);
+        retract(rPwnSingle, lPwnSingle);
+      }
+
       screenShown = 1;
     }
   }
@@ -903,7 +912,6 @@ void loop()
     if(screenShown == 1) {
       if(redButton == LOW) {
         screenShown = 0;
-        setupComplete = 0;
         displayCount = 2;
         testSelection = 2;
         distanceAdjustment = 0;
@@ -917,7 +925,6 @@ void loop()
         
       if(greenButton == LOW) {
         screenShown = 0;
-        setupComplete = 0;
         displayCount = 2;
         testSelection = 1;
         distanceAdjustment = 0;
@@ -946,31 +953,6 @@ void loop()
   }
 
   if(testSelection == 1) {
-    if(setupComplete == 0) {
-      double setupDoubleDistance = getAntennaDistance(doubleArmDistance);
-      double setupSingleDistance = getAntennaDistance(singleArmDistance);
-
-      if(setupDoubleDistance < 15.0) {
-        extend(rPwnUpper, lPwnUpper);
-      }
-      else if(setupDoubleDistance > 15.0) {
-        retract(rPwnUpper, lPwnUpper);
-      }
-      else {
-        stopActuator(rPwnUpper, lPwnUpper);
-      }
-
-      if(setupSingleDistance < 15.0) {
-        extend(rPwnSingle, lPwnSingle);
-      }
-      else if(setupSingleDistance > 15.0) {
-        retract(rPwnSingle, lPwnSingle);
-      }
-      else {
-        stopActuator(rPwnSingle, lPwnSingle);
-      }
-
-    }
     if(displayCount == 2) {
       if(screenShown == 1) {
         /* Press all three buttons to return to main menu */
@@ -978,9 +960,7 @@ void loop()
           screenShown = 0;
           displayCount = 0;
         }
-        else {
-          setupComplete = 1;
-
+        else {   
           double refDistance = getAntennaDistance(doubleArmDistance);
           double sigDistance = getAntennaDistance(singleArmDistance);
 
@@ -998,16 +978,16 @@ void loop()
             }
             else if(antennaSelection == 2) {
               // Bravo
-              refDistance = refDistance - 3.78;
-              sigDistance = sigDistance - 3.78;
+              refDistance = refDistance - 4.78;
+              sigDistance = sigDistance - 4.78;
             }
           }
 
           myGLCD.setColor(255, 255, 255);
-          myGLCD.printNumF(refDistance, 420, 180, '.', 3, ' ');
-          myGLCD.print("in(D)", 460, 180);
-          myGLCD.printNumF(sigDistance, 420, 210, '.', 3, ' ');
-          myGLCD.print("in(S)", 460, 210);
+          myGLCD.printNumF(refDistance, 1, 390, 180, '.', 3, ' ');
+          myGLCD.print("in(D)", 461, 180);
+          myGLCD.printNumF(sigDistance, 1, 390, 210, '.', 3, ' ');
+          myGLCD.print("in(S)", 461, 210);
 
           if(redButton == LOW) {
             retract(rPwnUpper, lPwnUpper);
@@ -1046,7 +1026,7 @@ void loop()
         myGLCD.print("Antenna", 260, 175);
         myGLCD.print("Distance", 260, 205);
         myGLCD.setColor(255, 255, 255);
-        myGLCD.fillRoundRect(400, 160, 540, 240);
+        myGLCD.fillRoundRect(390, 160, 540, 240);
 
         /* Draws three buttons on screen (Red, Black, Green) */
         myGLCD.setColor(255, 0, 0);
@@ -1075,6 +1055,7 @@ void loop()
             doubleArmMotor.setSpeed(-150); 
             doubleArmMotor.runSpeed(); 
           }
+
           /* Black button + Red button to move to next screen */
           else if(blackButton == LOW) {
             if(redButton == LOW) {
@@ -1082,6 +1063,7 @@ void loop()
               displayCount = 2;
             }
           }
+          
           else if(greenButton == LOW) {
             doubleArmMotor.setSpeed(150);
             doubleArmMotor.runSpeed();
@@ -1089,11 +1071,10 @@ void loop()
           else {
             double doubleAngle = getArmAngle(doubleArmAngle);
             double sigAngle = getArmAngle(singleArmAngle);
-
             myGLCD.setColor(255, 255, 255);
-            myGLCD.printNumF(doubleAngle, 400, 180, '.', 3, ' ');
+            myGLCD.printNumF(doubleAngle, 1, 380, 180, '.', 3, ' ');
             myGLCD.print("deg(D)", 445, 180);
-            myGLCD.printNumF(sigAngle, 400, 210, '.', 3, ' ');
+            myGLCD.printNumF(sigAngle, 1, 380, 210, '.', 3, ' ');
             myGLCD.print("deg(S)", 445, 210);
           }
         }
@@ -1111,7 +1092,7 @@ void loop()
         myGLCD.print("Antenna", 260, 175);
         myGLCD.print("Angle", 260, 205);
         myGLCD.setColor(255, 255, 255);
-        myGLCD.fillRoundRect(400, 160, 540, 240);
+        myGLCD.fillRoundRect(380, 160, 540, 240);
 
         /* Draws three buttons on screen (Red, Black, Green) */
         myGLCD.setColor(255, 0, 0);
@@ -1129,22 +1110,6 @@ void loop()
   }
 
   if(testSelection == 2) {
-    if(setupComplete == 0) {
-      double setupInsertionDistance = getAntennaDistance(doubleArmDistance);
-
-      if(setupInsertionDistance < 15.0) {
-        extend(rPwnUpper, lPwnUpper);
-        extend(rPwnLower, lPwnLower);
-      }
-      else if(setupInsertionDistance > 15.0) {
-        retract(rPwnUpper, lPwnUpper);
-        retract(rPwnLower, lPwnLower);
-      }
-      else {
-        stopActuator(rPwnUpper, lPwnUpper);
-        stopActuator(rPwnLower, lPwnLower);
-      }
-    }
     if(displayCount == 2) {
       if(screenShown == 1) {
         /* Press all three buttons to return to main menu */
@@ -1153,9 +1118,7 @@ void loop()
           displayCount = 0;
         }
         /* Black button pressed */
-        else { 
-          setupComplete = 1;
-
+        else {   
           double insDistance = getAntennaDistance(doubleArmDistance);
 
           if(distanceAdjustment == 0) {
@@ -1170,17 +1133,18 @@ void loop()
             }
             else if(antennaSelection == 2) {
               // Bravo
-              insDistance = insDistance - 3.78;
+              insDistance = insDistance - 4.78;
             }
           }
 
           myGLCD.setColor(255, 255, 255);
-          myGLCD.printNumF(insDistance, 420, 190, '.', 3, ' ');
-          myGLCD.print("in", 460, 190);
+          myGLCD.printNumF(insDistance, 1, 390, 190, '.', 3, ' ');
+          myGLCD.print("in(D)", 460, 190);
 
           if(redButton == LOW) {
             retract(rPwnUpper, lPwnUpper);
             retract(rPwnLower, lPwnLower);
+            retract(rPwnSingle, lPwnSingle);
           }
           /* Black button pressed to move to next screen */
           else if(blackButton == LOW) {
@@ -1192,10 +1156,12 @@ void loop()
           else if(greenButton == LOW) {
             extend(rPwnUpper, lPwnUpper);
             extend(rPwnLower, lPwnLower);
+            extend(rPwnSingle, lPwnSingle);
           }
           else {
             stopActuator(rPwnUpper, lPwnUpper);
             stopActuator(rPwnLower, lPwnLower);
+            stopActuator(rPwnSingle, lPwnSingle);
           }
         }
       }
@@ -1212,7 +1178,7 @@ void loop()
         myGLCD.print("Antenna", 260, 175);
         myGLCD.print("Distance", 260, 205);
         myGLCD.setColor(255, 255, 255);
-        myGLCD.fillRoundRect(400, 160, 540, 240);
+        myGLCD.fillRoundRect(390, 160, 540, 240);
 
         /* Draws three buttons on screen (Red, Black, Green) */
         myGLCD.setColor(255, 0, 0);
@@ -1242,7 +1208,6 @@ void loop()
             doubleArmMotor.setSpeed(-150);
             doubleArmMotor.runSpeed();
           }
-
           /* Black button single press */
           else if(blackButton == LOW) {
             if(redButton == LOW) {
@@ -1250,16 +1215,16 @@ void loop()
               displayCount = 2;
             }
           }
-
           else if(greenButton == LOW) {
             doubleArmMotor.setSpeed(150);
             doubleArmMotor.runSpeed();
           }
           else {
             double insAngle = getArmAngle(doubleArmAngle);
+
             myGLCD.setColor(255, 255, 255);
-            myGLCD.printNumF(insAngle, 405, 190, '.', 3, ' ');
-            myGLCD.print("deg", 445, 190);
+            myGLCD.printNumF(insAngle, 1, 380, 190, '.', 3, ' ');
+            myGLCD.print("deg(D)", 445, 190);
           }
         }
       }
@@ -1276,7 +1241,7 @@ void loop()
         myGLCD.print("Antenna", 260, 175);
         myGLCD.print("Angle", 260, 205);
         myGLCD.setColor(255, 255, 255);
-        myGLCD.fillRoundRect(400, 160, 540, 240);
+        myGLCD.fillRoundRect(380, 160, 540, 240);
 
         /* Draws three buttons on screen (Red, Black, Green) */
         myGLCD.setColor(255, 0, 0);
