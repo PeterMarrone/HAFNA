@@ -20,6 +20,9 @@ const int rPwnLower = 4;
 const int lPwnSingle = 3;
 const int rPwnSingle = 2;
 
+int MAX_SPEED = 255;
+int SINGLE_ARM_SPEED = 245;
+
 const int red = 54;
 const int black = 55;
 const int green = 56;
@@ -769,6 +772,7 @@ double getArmAngle(Adafruit_LIS3DH Arm) {
 
   double printValue = 0;
   double value = atan(sqrt(pow(Arm.x_g,2) + pow(Arm.y_g,2)) / Arm.z_g) * 57.3;
+  //double value = asin(Arm.x) * 57.3;
 
   if(value < 5.00) {
     printValue = 0;
@@ -789,14 +793,14 @@ double getAntennaDistance(NewPing sensor) {
   return(sensor.convert_cm(ping) / 2.54);
 }
 
-void extend(const int RPWN, const int LPWN) {
-  digitalWrite(RPWN, HIGH);
+void extend(const int RPWN, const int LPWN, int SPEED) {
+  digitalWrite(RPWN, SPEED);
   digitalWrite(LPWN, LOW);
 }
 
-void retract(const int RPWN, const int LPWN) {
+void retract(const int RPWN, const int LPWN, int SPEED) {
   digitalWrite(RPWN, LOW);
-  digitalWrite(LPWN, HIGH);
+  digitalWrite(LPWN, SPEED);
 }
 
 void stopActuator(const int RPWN, const int LPWN) {
@@ -845,6 +849,9 @@ void setup()
   stopActuator(rPwnUpper, lPwnUpper);
   stopActuator(rPwnLower, lPwnLower);
   stopActuator(rPwnSingle, lPwnSingle);
+
+  doubleArmAngle.setDataRate(LIS3DH_DATARATE_1_HZ);
+  singleArmAngle.setDataRate(LIS3DH_DATARATE_1_HZ);
 
   doubleArmAngle.begin(0x19);
   singleArmAngle.begin(0x18);
@@ -895,14 +902,10 @@ void loop()
       myGLCD.fillCircle(550, 400, 50);
       myGLCD.print("Bravo", 510, 325);
 
-      double setupDistance = getAntennaDistance(doubleArmDistance);
-      
-      while(setupDistance < 10.0) {
-        /* Retracts arms at beginning of program */
-        retract(rPwnUpper, lPwnUpper);
-        retract(rPwnLower, lPwnLower);
-        retract(rPwnSingle, lPwnSingle);
-      }
+      /* Retracts arms at beginning of program */
+      retract(rPwnUpper, lPwnUpper, MAX_SPEED);
+      retract(rPwnLower, lPwnLower, MAX_SPEED);
+      retract(rPwnSingle, lPwnSingle, MAX_SPEED);
 
       screenShown = 1;
     }
@@ -990,9 +993,8 @@ void loop()
           myGLCD.print("in(S)", 461, 210);
 
           if(redButton == LOW) {
-            retract(rPwnUpper, lPwnUpper);
-            retract(rPwnLower, lPwnLower);
-            retract(rPwnSingle, lPwnSingle);
+            retract(rPwnUpper, lPwnUpper, MAX_SPEED);
+            retract(rPwnSingle, lPwnSingle, SINGLE_ARM_SPEED);
           }
           /* Black button + Green button to move to next screen */
           else if(blackButton == LOW) {
@@ -1002,13 +1004,12 @@ void loop()
             }
           }
           else if(greenButton == LOW) {
-            extend(rPwnUpper, lPwnUpper);
-            extend(rPwnLower, lPwnLower);
-            extend(rPwnSingle, lPwnSingle);
+            extend(rPwnUpper, lPwnUpper, MAX_SPEED);
+            extend(rPwnSingle, lPwnSingle, SINGLE_ARM_SPEED);
           }
           else {
             stopActuator(rPwnUpper, lPwnUpper);
-            stopActuator(rPwnLower, lPwnLower);
+            stopActuator(rPwnSingle, lPwnSingle);
             stopActuator(rPwnSingle, lPwnSingle);
           }
         }
@@ -1142,9 +1143,8 @@ void loop()
           myGLCD.print("in(D)", 460, 190);
 
           if(redButton == LOW) {
-            retract(rPwnUpper, lPwnUpper);
-            retract(rPwnLower, lPwnLower);
-            retract(rPwnSingle, lPwnSingle);
+            retract(rPwnUpper, lPwnUpper, MAX_SPEED);
+            retract(rPwnLower, lPwnLower, MAX_SPEED);
           }
           /* Black button pressed to move to next screen */
           else if(blackButton == LOW) {
@@ -1154,9 +1154,8 @@ void loop()
             }
           }
           else if(greenButton == LOW) {
-            extend(rPwnUpper, lPwnUpper);
-            extend(rPwnLower, lPwnLower);
-            extend(rPwnSingle, lPwnSingle);
+            extend(rPwnUpper, lPwnUpper, MAX_SPEED);
+            extend(rPwnLower, lPwnLower, MAX_SPEED);
           }
           else {
             stopActuator(rPwnUpper, lPwnUpper);
